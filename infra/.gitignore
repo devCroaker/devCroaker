@@ -1,0 +1,4 @@
+cdk.out/
+# Contains the AWS account id. This repository is public, so the lookup is
+# performed live at synth time instead. CI has credentials via the OIDC role.
+cdk.context.json

@@ -1,0 +1,29 @@
+{
+  "name": "@devcroaker/infra",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "synth": "cdk synth",
+    "diff": "cdk diff",
+    "deploy": "cdk deploy --all",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.265.0",
+    "constructs": "^10.8.1"
+  },
+  "devDependencies": {
+    "@devcroaker/config": "workspace:*",
+    "@types/node": "^26.2.0",
+    "aws-cdk": "^2.1136.0",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.8.1",
+    "tsx": "^4.23.12",
+    "typescript": "5.9.3",
+    "vitest": "^4.1.10"
+  }
+}
