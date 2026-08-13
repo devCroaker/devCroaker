@@ -1,0 +1,732 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "devCroaker API",
+    "version": "0.1.0",
+    "description": "REST API backing dev.croaker.me. The OpenAPI document is generated from the same Zod schemas used for runtime validation, so the two cannot drift apart."
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Cognito-issued JWT, validated by the API Gateway authorizer."
+      }
+    },
+    "schemas": {
+      "Health": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ok", "degraded"]
+          },
+          "database": {
+            "type": "string",
+            "enum": ["up", "down"]
+          },
+          "uptimeSeconds": {
+            "type": "number"
+          }
+        },
+        "required": ["status", "database", "uptimeSeconds"]
+      },
+      "ProjectList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Project"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "example": 42
+          },
+          "limit": {
+            "type": "integer",
+            "example": 20
+          },
+          "offset": {
+            "type": "integer",
+            "example": 0
+          }
+        },
+        "required": ["items", "total", "limit", "offset"]
+      },
+      "Project": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "example": "devcroaker"
+          },
+          "title": {
+            "type": "string",
+            "example": "devCroaker"
+          },
+          "summary": {
+            "type": "string",
+            "example": "Personal site and reference implementation."
+          },
+          "description": {
+            "type": ["string", "null"]
+          },
+          "repoUrl": {
+            "type": ["string", "null"],
+            "format": "uri"
+          },
+          "liveUrl": {
+            "type": ["string", "null"],
+            "format": "uri"
+          },
+          "techStack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": ["TypeScript", "AWS CDK"]
+          },
+          "status": {
+            "$ref": "#/components/schemas/PublishStatus"
+          },
+          "featured": {
+            "type": "boolean"
+          },
+          "sortOrder": {
+            "type": "integer"
+          },
+          "publishedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "summary",
+          "description",
+          "repoUrl",
+          "liveUrl",
+          "techStack",
+          "status",
+          "featured",
+          "sortOrder",
+          "publishedAt",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PublishStatus": {
+        "type": "string",
+        "enum": ["draft", "published", "archived"]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "not_found"
+              },
+              "message": {
+                "type": "string",
+                "example": "Project not found"
+              }
+            },
+            "required": ["code", "message"]
+          }
+        },
+        "required": ["error"]
+      },
+      "CreateProject": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "example": "devcroaker"
+          },
+          "title": {
+            "type": "string",
+            "example": "devCroaker"
+          },
+          "summary": {
+            "type": "string",
+            "example": "Personal site and reference implementation."
+          },
+          "description": {
+            "type": ["string", "null"]
+          },
+          "repoUrl": {
+            "type": ["string", "null"],
+            "format": "uri"
+          },
+          "liveUrl": {
+            "type": ["string", "null"],
+            "format": "uri"
+          },
+          "techStack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": ["TypeScript", "AWS CDK"]
+          },
+          "status": {
+            "$ref": "#/components/schemas/PublishStatus"
+          },
+          "featured": {
+            "type": "boolean"
+          },
+          "sortOrder": {
+            "type": "integer"
+          },
+          "publishedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          }
+        },
+        "required": ["slug", "title", "summary"]
+      },
+      "PostList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostSummary"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "example": 42
+          },
+          "limit": {
+            "type": "integer",
+            "example": 20
+          },
+          "offset": {
+            "type": "integer",
+            "example": 0
+          }
+        },
+        "required": ["items", "total", "limit", "offset"]
+      },
+      "PostSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "example": "building-a-cheap-aws-stack"
+          },
+          "title": {
+            "type": "string"
+          },
+          "excerpt": {
+            "type": ["string", "null"]
+          },
+          "status": {
+            "$ref": "#/components/schemas/PublishStatus"
+          },
+          "authorId": {
+            "type": ["string", "null"],
+            "format": "uuid"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "publishedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "excerpt",
+          "status",
+          "authorId",
+          "tags",
+          "publishedAt",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "example": "aws"
+          },
+          "name": {
+            "type": "string",
+            "example": "AWS"
+          }
+        },
+        "required": ["id", "slug", "name"]
+      },
+      "Post": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "example": "building-a-cheap-aws-stack"
+          },
+          "title": {
+            "type": "string"
+          },
+          "excerpt": {
+            "type": ["string", "null"]
+          },
+          "body": {
+            "type": "string",
+            "description": "Markdown source."
+          },
+          "status": {
+            "$ref": "#/components/schemas/PublishStatus"
+          },
+          "authorId": {
+            "type": ["string", "null"],
+            "format": "uuid"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "publishedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "excerpt",
+          "body",
+          "status",
+          "authorId",
+          "tags",
+          "publishedAt",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreatePost": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "example": "building-a-cheap-aws-stack"
+          },
+          "title": {
+            "type": "string"
+          },
+          "excerpt": {
+            "type": ["string", "null"]
+          },
+          "body": {
+            "type": "string",
+            "description": "Markdown source."
+          },
+          "status": {
+            "$ref": "#/components/schemas/PublishStatus"
+          },
+          "authorId": {
+            "type": ["string", "null"],
+            "format": "uuid"
+          },
+          "publishedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "tagSlugs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["slug", "title", "body"]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": ["System"],
+        "summary": "Liveness and database connectivity check",
+        "responses": {
+          "200": {
+            "description": "Service is reachable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects": {
+      "get": {
+        "tags": ["Projects"],
+        "summary": "List projects",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": ["integer", "null"],
+              "minimum": 0,
+              "default": 0,
+              "example": 0
+            },
+            "required": false,
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "$ref": "#/components/schemas/PublishStatus"
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["true", "false"]
+            },
+            "required": false,
+            "name": "featured",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of projects.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Projects"],
+        "summary": "Create a project",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProject"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The created project.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A project with that slug already exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{slug}": {
+      "get": {
+        "tags": ["Projects"],
+        "summary": "Fetch a single project by slug",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "example": "my-first-project"
+            },
+            "required": true,
+            "name": "slug",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested project.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No project with that slug.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "List posts (summaries, without the body)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "example": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": ["integer", "null"],
+              "minimum": 0,
+              "default": 0,
+              "example": 0
+            },
+            "required": false,
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "$ref": "#/components/schemas/PublishStatus"
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "aws"
+            },
+            "required": false,
+            "name": "tag",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of post summaries.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Posts"],
+        "summary": "Create a post",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePost"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The created post.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A post with that slug already exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{slug}": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Fetch a single post by slug, including its Markdown body",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "example": "my-first-project"
+            },
+            "required": true,
+            "name": "slug",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested post.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No post with that slug.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}

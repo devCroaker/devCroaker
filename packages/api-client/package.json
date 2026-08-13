@@ -1,0 +1,30 @@
+{
+  "name": "@devcroaker/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "openapi-typescript ../../apps/api/openapi.json -o src/schema.gen.ts",
+    "build": "pnpm run generate",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.17.0"
+  },
+  "devDependencies": {
+    "@devcroaker/api": "workspace:*",
+    "@devcroaker/config": "workspace:*",
+    "@types/node": "^26.2.0",
+    "eslint": "^10.8.1",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "5.9.3",
+    "vitest": "^4.1.10"
+  }
+}
