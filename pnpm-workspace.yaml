@@ -2,3 +2,10 @@ packages:
   - "apps/*"
   - "packages/*"
   - "infra"
+# esbuild ships prebuilt platform binaries via a postinstall script.
+# Required by drizzle-kit and vite.
+allowBuilds:
+  esbuild: true
+minimumReleaseAgeExclude:
+  - "@aws-sdk/credential-providers@3.1110.0"
+  - "@aws-sdk/rds-signer@3.1110.0"
