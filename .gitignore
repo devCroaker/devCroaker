@@ -1,0 +1,28 @@
+# deps
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+cdk.out/
+.open-next/
+
+# caches
+.turbo/
+.eslintcache
+coverage/
+playwright-report/
+test-results/
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# os / editor
+.DS_Store
+*.log
